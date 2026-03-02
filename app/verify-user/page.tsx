@@ -33,7 +33,7 @@ export default function VerifyUserPage() {
         
         if (userError) {
           setUserInfo({ error: userError.message })
-        } else {
+        } else if (user) {
           // Get profile
           const { data: profile } = await supabase
             .from('profiles')
