@@ -29,11 +29,12 @@ export default function VerifyUserPage() {
 
       if (data?.user) {
         // Get full user info
-        const { data: { user }, error: userError } = await supabase.auth.getUser()
+        const { data: userData, error: userError } = await supabase.auth.getUser()
         
         if (userError) {
           setUserInfo({ error: userError.message })
-        } else if (user) {
+        } else if (userData?.user) {
+          const user = userData.user
           // Get profile
           const { data: profile } = await supabase
             .from('profiles')
