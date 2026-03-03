@@ -115,9 +115,9 @@ export default function PrintPage() {
           <div className="print-code">{meal.code}</div>
         </div>
 
-        {/* Sell By */}
+        {/* Consume By */}
         <div className="print-meta">
-          <div>Sell By: {formatDate(expirationDate)}</div>
+          <div>Consume By: {formatDate(expirationDate)}</div>
         </div>
 
         {/* Nutrition Facts */}
