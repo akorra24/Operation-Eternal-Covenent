@@ -22,6 +22,7 @@ interface Meal {
 
 interface Settings {
   default_shelf_life_days: number
+  produced_by: string | null
 }
 
 export default function PrintPage() {
@@ -38,7 +39,7 @@ export default function PrintPage() {
       
       const [mealResult, settingsResult] = await Promise.all([
         supabase.from('meals').select('*').eq('code', code).single(),
-        supabase.from('settings').select('default_shelf_life_days').eq('id', 1).single(),
+        supabase.from('settings').select('default_shelf_life_days, produced_by').eq('id', 1).single(),
       ])
 
       if (mealResult.data) setMeal(mealResult.data)
@@ -50,16 +51,22 @@ export default function PrintPage() {
   }, [code])
 
   useEffect(() => {
+    if (meal?.title) {
+      document.title = `Label for ${meal.title}`
+    }
+  }, [meal])
+
+  useEffect(() => {
     if (!loading && meal && barcodeRef.current) {
       // Dynamically import jsbarcode to avoid SSR issues
       import('jsbarcode').then((JsBarcode) => {
         try {
           JsBarcode.default(barcodeRef.current, meal.code, {
             format: 'CODE128',
-            width: 2.0,
-            height: 40,
+            width: 1,
+            height: 10,
             displayValue: false,
-            margin: 0,
+            margin: 10,
           })
           
           // Auto print after a short delay to ensure barcode is rendered
@@ -91,115 +98,103 @@ export default function PrintPage() {
   expirationDate.setDate(today.getDate() + shelfLifeDays)
 
   const formatDate = (date: Date) => {
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const year = date.getFullYear()
-    return `${month}/${day}/${year}`
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`
   }
 
+  const producedBy = settings?.produced_by || '1025 PCH, Hermosa Beach, 90254'
+
   return (
-    <>
-      {/* Print View - Simple Clean Layout */}
-      <div className="print-label">
-        {/* Logo */}
-        <div className="print-logo-container">
-          <img src="/logo.svg" alt="Logo" className="print-logo" />
+    <div className="rollo-print-root">
+      <div className="rollo-label">
+        <div className="rollo-logo">
+          <img src="/rfgweb.svg" alt="Ready Fit Go" />
         </div>
 
-        {/* Title */}
-        <div className="print-label-title">{meal.title}</div>
+        <div className="rollo-title">{meal.title}</div>
 
-        {/* Barcode */}
-        <div className="print-barcode-container">
-          <svg ref={barcodeRef} className="print-barcode" />
-          <div className="print-code">{meal.code}</div>
+        <div className="rollo-barcode">
+          <svg ref={barcodeRef} />
         </div>
 
-        {/* Consume By */}
-        <div className="print-meta">
-          <div>Consume By: {formatDate(expirationDate)}</div>
+        <div className="rollo-meta">
+          <div>Sell By: {formatDate(expirationDate)}</div>
+          <div className="rollo-produced">Produced By: {producedBy}</div>
         </div>
 
-        {/* Nutrition Facts */}
-        {(meal.calories !== null || meal.protein !== null || meal.carbs !== null || meal.fat !== null || meal.sugar !== null || meal.sodium !== null || meal.weight !== null) && (
-          <div className="print-nutrition">
-            <div className="print-nutrition-title">Nutrition Facts</div>
-            
-            {meal.weight !== null && (
-              <div className="print-nutrition-row">
-                <span>Net Weight:</span>
-                <span>{meal.weight}g</span>
-              </div>
-            )}
+        <div className="rollo-nutrition">
+          <div className="rollo-nutrition-title">Nutrition Facts</div>
 
-            {meal.calories !== null && (
-              <div className="print-nutrition-row">
-                <span>Calories:</span>
-                <span>{meal.calories}</span>
-              </div>
-            )}
+          {meal.weight !== null && (
+            <div className="rollo-weight">Net Weight: {meal.weight} g</div>
+          )}
 
-            {meal.protein !== null && (
-              <div className="print-nutrition-row">
-                <span>Protein:</span>
-                <span>{meal.protein}g</span>
-              </div>
-            )}
+          {meal.calories !== null && (
+            <div className="rollo-nutrition-row">
+              <span>Calories</span>
+              <span>{meal.calories}</span>
+            </div>
+          )}
 
-            {meal.carbs !== null && (
-              <div className="print-nutrition-row">
-                <span>Carbs:</span>
-                <span>{meal.carbs}g</span>
-              </div>
-            )}
+          {meal.protein !== null && (
+            <div className="rollo-nutrition-row">
+              <span>Protein</span>
+              <span>{meal.protein} g</span>
+            </div>
+          )}
 
-            {meal.sugar !== null && (
-              <div className="print-nutrition-row">
-                <span>Sugar:</span>
-                <span>{meal.sugar}g</span>
-              </div>
-            )}
+          {meal.carbs !== null && (
+            <div className="rollo-nutrition-row">
+              <span>Carbs</span>
+              <span>{meal.carbs} g</span>
+            </div>
+          )}
 
-            {meal.sodium !== null && (
-              <div className="print-nutrition-row">
-                <span>Sodium:</span>
-                <span>{meal.sodium}mg</span>
-              </div>
-            )}
+          {meal.sugar !== null && (
+            <div className="rollo-nutrition-row">
+              <span>Sugar</span>
+              <span>{meal.sugar} g</span>
+            </div>
+          )}
 
-            {meal.fat !== null && (
-              <div className="print-nutrition-row">
-                <span>Fat:</span>
-                <span>{meal.fat}g</span>
-              </div>
-            )}
-          </div>
-        )}
+          {meal.fat !== null && (
+            <div className="rollo-nutrition-row">
+              <span>Fat</span>
+              <span>{meal.fat} g</span>
+            </div>
+          )}
 
-        {/* Instructions */}
+          {meal.sodium !== null && (
+            <div className="rollo-nutrition-row">
+              <span>Sodium</span>
+              <span>{meal.sodium} mg</span>
+            </div>
+          )}
+        </div>
+
         {meal.instructions && (
-          <div className="print-instructions">{meal.instructions}</div>
+          <div className="rollo-instructions">{meal.instructions}</div>
         )}
 
-        {/* Ingredients */}
         {meal.ingredients && (
-          <div className="print-ingredients">
-            <span className="print-section-title">Ingredients:</span>
-            <span className="print-section-text">{meal.ingredients}</span>
+          <div className="rollo-ingredients">
+            <div>
+              <div>Ingredients:</div>
+              <div>{meal.ingredients}</div>
+            </div>
           </div>
         )}
 
-        {/* Contains */}
         {meal.contains && (
-          <div className="print-contains">
-            <span className="print-section-title">Contains:</span>
-            <span className="print-section-text">{meal.contains}</span>
+          <div className="rollo-contains">
+            <div>
+              <div>Contains:</div>
+              <div>{meal.contains}</div>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Non-print controls */}
-      <div className="no-print mt-8 text-center">
+      <div className="no-print" style={{ position: 'fixed', bottom: 16, left: 0, right: 0, textAlign: 'center' }}>
         <button
           onClick={() => window.print()}
           className="rounded bg-green-600 px-6 py-3 font-medium text-white hover:bg-green-700"
@@ -207,14 +202,11 @@ export default function PrintPage() {
           Print Again
         </button>
         <div className="mt-4">
-          <a
-            href="/meals"
-            className="text-blue-600 hover:text-blue-800"
-          >
+          <a href="/meals" className="text-blue-600 hover:text-blue-800">
             Back to meals
           </a>
         </div>
       </div>
-    </>
+    </div>
   )
 }

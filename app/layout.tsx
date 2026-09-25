@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { Nav } from '@/components/Nav'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -10,7 +9,7 @@ export const metadata: Metadata = {
   description: 'Multi-location label printing system',
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
@@ -24,10 +23,7 @@ export default async function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <Nav />
-        <main className="container mx-auto px-4 py-8">
-          {children}
-        </main>
+        {children}
       </body>
     </html>
   )
