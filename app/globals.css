@@ -163,7 +163,7 @@ body:has(.rollo-label) {
 .rollo-logo {
   display: flex;
   justify-content: center;
-  padding: 10px 0;
+  padding: 2px 0;
 }
 
 .rollo-logo img {
@@ -174,7 +174,7 @@ body:has(.rollo-label) {
 .rollo-title {
   display: block;
   text-align: center;
-  padding: 10px 0;
+  padding: 2px 0;
   font-weight: bold;
 }
 
@@ -205,14 +205,14 @@ body:has(.rollo-label) {
 
 .rollo-nutrition {
   display: block;
-  padding: 5px 10px;
+  padding: 1px 10px;
 }
 
 .rollo-nutrition-title {
   display: block;
   font-weight: bold;
   text-align: center;
-  margin-top: 5px;
+  margin-top: 0;
   padding: 1px 0;
   font-size: 13px;
   border-bottom: solid 3px black;
@@ -220,14 +220,14 @@ body:has(.rollo-label) {
 
 .rollo-weight {
   display: block;
-  padding: 5px;
+  padding: 2px 5px;
   font-size: 12px;
   border-bottom: solid 1px black;
 }
 
 .rollo-nutrition-row {
   display: block;
-  padding: 5px;
+  padding: 2px 5px;
   font-size: 12px;
   border-bottom: solid 1px black;
 }
@@ -250,9 +250,8 @@ body:has(.rollo-label) {
 }
 
 .rollo-ingredients {
-  display: flex;
-  align-items: center;
-  height: 35px;
+  display: block;
+  padding: 2px;
   font-size: 12px;
   text-align: center;
 }
